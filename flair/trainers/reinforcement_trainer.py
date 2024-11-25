@@ -233,10 +233,14 @@ class ReinforcementTrainer(ModelDistiller):
 		self.config = config
 		self.use_bert = False
 		self.bert_tokenizer = None
+
+		print("=================================================================\n")
 		for embedding in self.model.embeddings.embeddings:
+			print("\nembedding: ", embedding.__class__.__name__.lower())
 			if 'bert' in embedding.__class__.__name__.lower():
 				self.use_bert=True
 				self.bert_tokenizer = embedding.tokenizer
+		print("=================================================================\n")
 
 		if hasattr(self.model,'remove_x') and self.model.remove_x:
 			for corpus_id in range(len(self.corpus2id)):
@@ -657,7 +661,6 @@ class ReinforcementTrainer(ModelDistiller):
 						
 					self.model.train()
 					self.controller.train()
-					# TODO: check teacher parameters fixed and with eval() mode
 
 					train_loss: float = 0
 
@@ -1475,6 +1478,10 @@ class ReinforcementTrainer(ModelDistiller):
 			self.model.keep_embedding=keep_embedding
 
 		for embedding in self.model.embeddings.embeddings:
+			print("=================================================================\n")
+			print("Embedding Name:", embedding.name)
+			print("Embedding Details:", embedding)
+			print("=================================================================\n")
 			# manually fix the bug for the tokenizer becoming None
 			if hasattr(embedding,'tokenizer') and embedding.tokenizer is None:
 				from transformers import AutoTokenizer
@@ -1511,6 +1518,15 @@ class ReinforcementTrainer(ModelDistiller):
 			log.info(test_results.log_line)
 			log.info(test_results.detailed_results)
 			log_line(log)
+
+			print("=================================================================\n")
+			print("\nSample Predictions:")
+			for sentence in list(self.corpus.test)[:5]:
+				print(f"Sentence: {' '.join([token.text for token in sentence])}")
+				for token in sentence:
+					print(f"Token: {token.text}, Predicted: {token.get_tag(self.model.tag_type).value}")
+			print("=================================================================\n")
+			
 		if quiet_mode:
 			enablePrint()
 			if overall_test:
@@ -1536,6 +1552,14 @@ class ReinforcementTrainer(ModelDistiller):
 				log.info('current corpus: '+subcorpus.name)
 				loader=ColumnDataLoader(list(subcorpus.test),eval_mini_batch_size,use_bert=self.use_bert,tokenizer=self.bert_tokenizer, model = self.model, sentence_level_batch = self.sentence_level_batch, sort_data=sort_data)
 				loader.assign_tags(self.model.tag_type,self.model.tag_dictionary)
+
+				print("=================================================================\n")
+				print("\nSample Sentences from Test Set:")
+				for sentence in list(self.corpus.test)[:5]:  # Ambil 5 kalimat pertama
+					print("Sentence Tokens:", [token.text for token in sentence])
+					print("Tags:", [token.get_tag(self.model.tag_type).value for token in sentence])
+				print("=================================================================\n")
+
 				with torch.no_grad():
 					self.gpu_friendly_assign_embedding([loader], selection = self.model.selection)
 					if self.controller.model_structure is not None:

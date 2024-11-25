@@ -60,9 +60,9 @@ train:
   controller_momentum: 0.9
   discount: 0.5
   learning_rate: 0.1
-  max_episodes: 30
-  max_epochs: 150
-  max_epochs_without_improvement: 25
+  max_episodes: 5
+  max_epochs: 30
+  max_epochs_without_improvement: 5
   mini_batch_size: 32
   monitor_test: false
   patience: 5

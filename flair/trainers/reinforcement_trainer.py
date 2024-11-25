@@ -1481,7 +1481,6 @@ class ReinforcementTrainer(ModelDistiller):
 		for embedding in self.model.embeddings.embeddings:
 			print("=================================================================\n")
 			print("Embedding Name:", embedding.name)
-			print("Embedding Details:", embedding)
 			print("=================================================================\n")
 			# manually fix the bug for the tokenizer becoming None
 			if hasattr(embedding,'tokenizer') and embedding.tokenizer is None:
@@ -1505,6 +1504,14 @@ class ReinforcementTrainer(ModelDistiller):
 		if overall_test:
 			loader=ColumnDataLoader(list(self.corpus.test),eval_mini_batch_size, use_bert=self.use_bert,tokenizer=self.bert_tokenizer, model = self.model, sentence_level_batch = self.sentence_level_batch, sort_data=sort_data)
 			loader.assign_tags(self.model.tag_type,self.model.tag_dictionary)
+
+			print("=================================================================\n")
+			print("\nSample Sentences from Test Set:")
+			for sentence in list(self.corpus.test)[:5]:  # Ambil 5 kalimat pertama
+				print("Sentence Tokens:", [token.text for token in sentence])
+				print("Tags:", [token.get_tag(self.model.tag_type).value for token in sentence])
+			print("=================================================================\n")
+
 			with torch.no_grad():
 				self.gpu_friendly_assign_embedding([loader], selection = self.model.selection)
 				if self.controller.model_structure is not None:

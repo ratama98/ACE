@@ -1138,17 +1138,17 @@ class ModelDistiller(ModelTrainer):
 		# torch.cuda.empty_cache()
 		embedlist = sorted([(embedding.name, embedding) for embedding in self.model.embeddings.embeddings], key = lambda x: x[0])
 		
-		print("=================================================================\n")
-		print("\nEMBEDLIST: ", embedlist)
-		for idx, embedding_tuple in enumerate(embedlist):
-			print(f"Embedding {idx + 1}: {embedding_tuple[0]}, Class: {embedding.__class__.__name__}")
-		print("=================================================================\n")
+		# print("=================================================================\n")
+		# print("\nEMBEDLIST: ", embedlist)
+		# for idx, embedding_tuple in enumerate(embedlist):
+		# 	print(f"Embedding {idx + 1}: {embedding_tuple[0]}, Class: {embedding.__class__.__name__}")
+		# print("=================================================================\n")
 		
 		print("===============================EMBEDDING ASSIGNMENT PRINTS==================================\n")
 		# for embedding in self.model.embeddings.embeddings:
 		for idx, embedding_tuple in enumerate(embedlist):
 			embedding = embedding_tuple[1]
-			
+			print(f"Embedding {idx + 1}: {embedding_tuple[0]}, Class: {embedding.__class__.__name__}")
 			if ('WordEmbeddings' != embedding.__class__.__name__ and 'FastWordEmbeddings' != embedding.__class__.__name__ and 'Char' not in embedding.__class__.__name__ and 'Lemma' not in embedding.__class__.__name__ and 'POS' not in embedding.__class__.__name__) and not (hasattr(embedding,'fine_tune') and embedding.fine_tune):
 				# pdb.set_trace()
 

@@ -1137,6 +1137,14 @@ class ModelDistiller(ModelTrainer):
 		# pdb.set_trace()
 		# torch.cuda.empty_cache()
 		embedlist = sorted([(embedding.name, embedding) for embedding in self.model.embeddings.embeddings], key = lambda x: x[0])
+		
+		print("=================================================================\n")
+		print("\nEMBEDLIST: ", embedlist)
+		for idx, embedding_tuple in enumerate(embedlist):
+			print(f"Embedding {idx + 1}: {embedding_tuple[0]}, Class: {embedding.__class__.__name__}")
+		print("=================================================================\n")
+		
+		print("===============================EMBEDDING ASSIGNMENT PRINTS==================================\n")
 		# for embedding in self.model.embeddings.embeddings:
 		for idx, embedding_tuple in enumerate(embedlist):
 			embedding = embedding_tuple[1]
@@ -1164,21 +1172,34 @@ class ModelDistiller(ModelTrainer):
 						embedding.ee.elmo_bilm._elmo_lstm._states[idx]=embedding.ee.elmo_bilm._elmo_lstm._states[idx].to(flair.device)
 				for loader_id, loader in enumerate(loaders):
 					for sentences in loader:
+						
+						print("Processing Sentences:\n")
+						for sentence in sentences:
+							print(f"Sentence: {' '.join([token.text for token in sentence.tokens])}")
+
 						lengths: List[int] = [len(sentence.tokens) for sentence in sentences]
 						longest_token_sequence_in_batch: int = max(lengths)
 						# if longest_token_sequence_in_batch>100:
 						#   pdb.set_trace()
 						embedding.embed(sentences)
 						store_embeddings(sentences, self.embeddings_storage_mode)
+
+						print("\nToken Embeddings:")
+						for sentence in sentences:
+							for token in sentence.tokens:
+								print(f"Token: {token.text}, Embedding: {token.embedding[:5]}\n")
+
 				embedding=embedding.to('cpu')
 				if 'elmo' in embedding.name:
 					embedding.ee.elmo_bilm.to('cpu')
 			else:
 				embedding=embedding.to(flair.device)
+		print("=================================================================\n")
 		# torch.cuda.empty_cache()
 		log.info("Finished Embeddings Assignments")
 		return 
 	def assign_predicted_embeddings(self,doc_dict,embedding,file_name):
+		print("===============================ASSIGN PREDICTED EMBEDDINGS==================================\n")
 		# torch.cuda.empty_cache()
 		lm_file = h5py.File(file_name, "r")
 		for key in doc_dict:
@@ -1198,12 +1219,20 @@ class ModelDistiller(ModelTrainer):
 			except:
 				pdb.set_trace()
 			for i, sentence in enumerate(doc_dict[key]):
+				print(f"\nProcessing Sentence {i + 1} in group '{key}':")
+				print("Tokens:")
+		
 				for token, token_idx in zip(sentence.tokens, range(len(sentence.tokens))):
 					word_embedding = sentences_emb[i][token_idx]
 					word_embedding = torch.from_numpy(word_embedding).view(-1)
 
 					token.set_embedding(embedding.name, word_embedding)
+
+					print(f"Token {token_idx + 1}: '{token.text}'")
+					print(f"Embedding: {word_embedding[:5]}")
+
 				store_embeddings([sentence], 'cpu')
 			# for idx, sentence in enumerate(doc_dict[key]):
 		log.info("Loaded predicted embeddings: "+file_name)
+		print("=================================================================\n")
 		return 

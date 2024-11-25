@@ -235,6 +235,7 @@ class ReinforcementTrainer(ModelDistiller):
 		self.bert_tokenizer = None
 
 		print("=================================================================\n")
+		print("\nembedding: ", self.model.embeddings.embeddings)
 		for embedding in self.model.embeddings.embeddings:
 			print("\nembedding: ", embedding.__class__.__name__.lower())
 			if 'bert' in embedding.__class__.__name__.lower():
@@ -1526,7 +1527,7 @@ class ReinforcementTrainer(ModelDistiller):
 				for token in sentence:
 					print(f"Token: {token.text}, Predicted: {token.get_tag(self.model.tag_type).value}")
 			print("=================================================================\n")
-			
+
 		if quiet_mode:
 			enablePrint()
 			if overall_test:

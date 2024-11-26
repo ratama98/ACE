@@ -1139,24 +1139,43 @@ class ModelDistiller(ModelTrainer):
 		embedlist = sorted([(embedding.name, embedding) for embedding in self.model.embeddings.embeddings], key = lambda x: x[0])
 		
 		print("==============================EMBEDDING SELECTIONS===================================\n")
+		def describe_embedding(embedding_tuple):
+			name, embedding = embedding_tuple
+			if 'bert' in name.lower():
+				return f"BERT: {name}"
+			elif 'roberta' in name.lower():
+				return f"XLM-RoBERTa: {name}"
+			elif 'elmo' in name.lower():
+				return f"ELMo: {name}"
+			elif 'word' in name.lower():
+				return f"Word: {name.split(':')[-1].strip()}"
+			elif 'char' in name.lower():
+				return f"Char: {name}"
+			elif 'fasttext' in name.lower():
+				return f"FastText: {name}"
+			else:
+				return name  # Kembalikan nama default jika tidak cocok dengan kategori
+
+		# Jika selection tidak None, bagi embedding menjadi dipilih dan tidak dipilih
 		if selection is not None:
-			selected_embeddings = [embedlist[idx][0] for idx, sel in enumerate(selection) if sel == 1]
-			unselected_embeddings = [embedlist[idx][0] for idx, sel in enumerate(selection) if sel == 0]
+			selected_embeddings = [describe_embedding(embedlist[idx]) for idx, sel in enumerate(selection) if sel == 1]
+			unselected_embeddings = [describe_embedding(embedlist[idx]) for idx, sel in enumerate(selection) if sel == 0]
 		else:
-			selected_embeddings = [embedding[0] for embedding in embedlist]
+			selected_embeddings = [describe_embedding(embedding) for embedding in embedlist]
 			unselected_embeddings = []
 
 		# Cetak embedding yang dipilih
 		print("--------Selected Embeddings:--------")
-		for embedding_name in selected_embeddings:
-			print(f" - {embedding_name}\n")
+		for embedding_desc in selected_embeddings:
+			print(f" - {embedding_desc}")
 
 		# Cetak embedding yang tidak dipilih
 		if unselected_embeddings:
 			print("\n--------Unselected Embeddings:--------")
-			for embedding_name in unselected_embeddings:
-				print(f" - {embedding_name}\n")
-		print("=================================================================\n")
+			for embedding_desc in unselected_embeddings:
+				print(f" - {embedding_desc}")
+
+		print("\n=========================================================================================\n")
 		
 		print("===============================EMBEDDING ASSIGNMENT PRINTS==================================\n")
 		# for embedding in self.model.embeddings.embeddings:

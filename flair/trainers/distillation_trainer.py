@@ -1186,9 +1186,9 @@ class ModelDistiller(ModelTrainer):
 
 						print("\nToken Embeddings:")
 						for sentence in sentences:
-							print(f"Token: {sentence.tokens.text}, Embedding: {sentence.tokens.embedding}\n")
-							# for token in sentence.tokens:
-							# 	print(f"Token: {token.text}, Embedding: {token.embedding[:5]}\n")
+							# print(f"Token: {sentence.tokens.text}, Embedding: {sentence.tokens.embedding}\n")
+							for token in sentence.tokens[:3]:
+								print(f"Token: {token.text}, Embedding: {token.embedding}\n")
 
 				embedding=embedding.to('cpu')
 				if 'elmo' in embedding.name:

@@ -1138,11 +1138,25 @@ class ModelDistiller(ModelTrainer):
 		# torch.cuda.empty_cache()
 		embedlist = sorted([(embedding.name, embedding) for embedding in self.model.embeddings.embeddings], key = lambda x: x[0])
 		
-		# print("=================================================================\n")
-		# print("\nEMBEDLIST: ", embedlist)
-		# for idx, embedding_tuple in enumerate(embedlist):
-		# 	print(f"Embedding {idx + 1}: {embedding_tuple[0]}, Class: {embedding.__class__.__name__}")
-		# print("=================================================================\n")
+		print("==============================EMBEDDING SELECTIONS===================================\n")
+		if selection is not None:
+			selected_embeddings = [embedlist[idx][0] for idx, sel in enumerate(selection) if sel == 1]
+			unselected_embeddings = [embedlist[idx][0] for idx, sel in enumerate(selection) if sel == 0]
+		else:
+			selected_embeddings = [embedding[0] for embedding in embedlist]
+			unselected_embeddings = []
+
+		# Cetak embedding yang dipilih
+		print("--------Selected Embeddings:--------")
+		for embedding_name in selected_embeddings:
+			print(f" - {embedding_name}\n")
+
+		# Cetak embedding yang tidak dipilih
+		if unselected_embeddings:
+			print("\n--------Unselected Embeddings:--------")
+			for embedding_name in unselected_embeddings:
+				print(f" - {embedding_name}\n")
+		print("=================================================================\n")
 		
 		print("===============================EMBEDDING ASSIGNMENT PRINTS==================================\n")
 		# for embedding in self.model.embeddings.embeddings:
